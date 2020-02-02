@@ -137,7 +137,7 @@
       
       
       <a class="forkMe" style="position:absolute;z-index:999;top:0;right:0.5em;" 
-        href="https://github.com/JoeyBling/hexo-theme-yilia-plus" target="_blank">
+        href="https://github.com/AmFn" target="_blank">
         <img src="/img/forkme.png"
           class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
       
@@ -213,6 +213,115 @@
           </div>
           <div id="js-content" class="content-ll">
             
+
+  
+    <article id="post-MySQL创建JDBC出现的一个小问题" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2020/02/02/MySQL%E5%88%9B%E5%BB%BAJDBC%E5%87%BA%E7%8E%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98/" target="_blank">MySQL创建JDBC出现的一个小问题</a>
+  
+    </h1>
+  
+
+
+  
+  
+<a href="/2020/02/02/MySQL%E5%88%9B%E5%BB%BAJDBC%E5%87%BA%E7%8E%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98/" class="archive-article-date">
+        <time datetime="2020-02-02T05:23:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-02</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <h2 id="MySQL创建JDBC出现的一个小问题"><a href="#MySQL创建JDBC出现的一个小问题" class="headerlink" title="MySQL创建JDBC出现的一个小问题"></a>MySQL创建JDBC出现的一个小问题</h2><h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
+<li><p>JDK -13.0</p>
+</li>
+<li><p>mysql-connertor-java - 8.9</p>
+</li>
+<li><p>MySql  8.0</p>
+</li>
+<li><p>IDEA 2019.3.2</p>
+</li>
+<li><p>druid-1.0.9</p>
+</li>
+</ul>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>在练习使用druid连接池获取连接对象时IDEA运行报错，测试类代码为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">druidDemo1</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Properties properties=<span class="keyword">new</span> Properties();</span><br><span class="line">        InputStream inputStream=druidDemo1.class.getClassLoader().getResourceAsStream("druid.properties");</span><br><span class="line">        properties.load(inputStream);</span><br><span class="line">       DataSource dataSource= DruidDataSourceFactory.createDataSource(properties);</span><br><span class="line">       Connection connection= dataSource.getConnection();</span><br><span class="line">        System.out.println(connection);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>druid.properties文件中配置信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">driverClassName&#x3D;com.mysql.jdbc.Driver</span><br><span class="line">url&#x3D;jdbc:mysql:&#x2F;&#x2F;127.0.0.1:3306&#x2F;db1</span><br></pre></td></tr></table></figure>
+
+<p>查看控制台报错信息</p>
+<p>Loading class <code>com.mysql.jdbc.Driver&#39;. This is deprecated. The new driver class is</code>com.mysql.cj.jdbc.Driver’.</p>
+<p>在mysql-connertor-java - 8.9中，com.mysql.jdbc.Driver已被弃用。</p>
+<p>查看第二条报错信息:</p>
+<p>java.sql.SQLException: The server time zone value ‘�й���׼ʱ��’ is unrecognized or represents more than one time zone. You must configure either the server or JDBC driver (via the ‘serverTimezone’ configuration property) to use a more specifc time zone value if you want to utilize time zone support.</p>
+<p>上网查询，发现是在使用mysql的jdbc驱动最新版（6.0+）时，遇到数据库和系统时区差异引起的问题。</p>
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>1.修改druid.properties 文件中的driverClassName为<code>driverClassName=com.mysql.cj.jdbc.Driver</code></p>
+<p>2.时区问题</p>
+<p> 第一种方法：在url中指定默认时区：</p>
+<p>在url后面加上serverTimezone=UTC或GMT即可</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">url&#x3D;jdbc:mysql:&#x2F;&#x2F;127.0.0.1:3306&#x2F;db1?serverTimezone&#x3D;UTC</span><br></pre></td></tr></table></figure>
+
+<p>第二种方法：sql语句配置时区：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt;  show variables like &#39;%time_zone%&#39;;</span><br><span class="line">+------------------+--------+</span><br><span class="line">| Variable_name    | Value  |</span><br><span class="line">+------------------+--------+</span><br><span class="line">| system_time_zone |        |</span><br><span class="line">| time_zone        | SYSTEM |</span><br><span class="line">+------------------+--------+</span><br><span class="line">2 rows in set, 1 warning (0.06 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; set global time_zone &#x3D; &#39;+8:00&#39;;</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; set time_zone &#x3D; &#39;+8:00&#39;;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; flush privileges;</span><br><span class="line">Query OK, 0 rows affected (0.07 sec)</span><br></pre></td></tr></table></figure>
+
+<p>重新运行，问题解决，能获取连接对象</p>
+<p>com.mysql.cj.jdbc.ConnectionImpl@45099dd3</p>
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+    
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2020/02/02/MySQL%E5%88%9B%E5%BB%BAJDBC%E5%87%BA%E7%8E%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
 
   
     <article id="post-第一次搭建hexo博客" class="article article-type-post  article-index" itemscope itemprop="blogPost">
