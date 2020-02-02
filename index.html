@@ -254,32 +254,9 @@
 <li><p>IDEA 2019.3.2</p>
 </li>
 <li><p>druid-1.0.9</p>
-</li>
-</ul>
-<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>在练习使用druid连接池获取连接对象时IDEA运行报错，测试类代码为：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">druidDemo1</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Properties properties=<span class="keyword">new</span> Properties();</span><br><span class="line">        InputStream inputStream=druidDemo1.class.getClassLoader().getResourceAsStream("druid.properties");</span><br><span class="line">        properties.load(inputStream);</span><br><span class="line">       DataSource dataSource= DruidDataSourceFactory.createDataSource(properties);</span><br><span class="line">       Connection connection= dataSource.getConnection();</span><br><span class="line">        System.out.println(connection);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>druid.properties文件中配置信息</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">driverClassName&#x3D;com.mysql.jdbc.Driver</span><br><span class="line">url&#x3D;jdbc:mysql:&#x2F;&#x2F;127.0.0.1:3306&#x2F;db1</span><br></pre></td></tr></table></figure>
-
-<p>查看控制台报错信息</p>
-<p>Loading class <code>com.mysql.jdbc.Driver&#39;. This is deprecated. The new driver class is</code>com.mysql.cj.jdbc.Driver’.</p>
-<p>在mysql-connertor-java - 8.9中，com.mysql.jdbc.Driver已被弃用。</p>
-<p>查看第二条报错信息:</p>
-<p>java.sql.SQLException: The server time zone value ‘�й���׼ʱ��’ is unrecognized or represents more than one time zone. You must configure either the server or JDBC driver (via the ‘serverTimezone’ configuration property) to use a more specifc time zone value if you want to utilize time zone support.</p>
-<p>上网查询，发现是在使用mysql的jdbc驱动最新版（6.0+）时，遇到数据库和系统时区差异引起的问题。</p>
-<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>1.修改druid.properties 文件中的driverClassName为<code>driverClassName=com.mysql.cj.jdbc.Driver</code></p>
-<p>2.时区问题</p>
-<p> 第一种方法：在url中指定默认时区：</p>
-<p>在url后面加上serverTimezone=UTC或GMT即可</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">url&#x3D;jdbc:mysql:&#x2F;&#x2F;127.0.0.1:3306&#x2F;db1?serverTimezone&#x3D;UTC</span><br></pre></td></tr></table></figure>
-
-<p>第二种方法：sql语句配置时区：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt;  show variables like &#39;%time_zone%&#39;;</span><br><span class="line">+------------------+--------+</span><br><span class="line">| Variable_name    | Value  |</span><br><span class="line">+------------------+--------+</span><br><span class="line">| system_time_zone |        |</span><br><span class="line">| time_zone        | SYSTEM |</span><br><span class="line">+------------------+--------+</span><br><span class="line">2 rows in set, 1 warning (0.06 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; set global time_zone &#x3D; &#39;+8:00&#39;;</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; set time_zone &#x3D; &#39;+8:00&#39;;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; flush privileges;</span><br><span class="line">Query OK, 0 rows affected (0.07 sec)</span><br></pre></td></tr></table></figure>
-
-<p>重新运行，问题解决，能获取连接对象</p>
-<p>com.mysql.cj.jdbc.ConnectionImpl@45099dd3</p>
-
+    
+    <a class="article-more-a" href="/2020/02/02/MySQL%E5%88%9B%E5%BB%BAJDBC%E5%87%BA%E7%8E%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98/#more">more >></a>
+    
     
 
     
@@ -355,32 +332,9 @@
     
     <h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>1.下载并安装nodejs</p>
 <p>2.下载安装git</p>
-<h2 id="安装-hexo"><a href="#安装-hexo" class="headerlink" title="安装 hexo"></a>安装 hexo</h2><h5 id="1-安装框架"><a href="#1-安装框架" class="headerlink" title="1.安装框架"></a>1.安装框架</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo</span><br></pre></td></tr></table></figure>
-
-<h5 id="2-初始化"><a href="#2-初始化" class="headerlink" title="2.初始化"></a>2.初始化</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo init</span><br></pre></td></tr></table></figure>
-
-<h5 id="3-安装组件"><a href="#3-安装组件" class="headerlink" title="3.安装组件"></a>3.安装组件</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install</span><br></pre></td></tr></table></figure>
-
-<h2 id="生成博客页面"><a href="#生成博客页面" class="headerlink" title="生成博客页面"></a>生成博客页面</h2><h5 id="1-生成静态页面"><a href="#1-生成静态页面" class="headerlink" title="1.生成静态页面"></a>1.生成静态页面</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo g</span><br></pre></td></tr></table></figure>
-
-<h5 id="2-启动本地服务"><a href="#2-启动本地服务" class="headerlink" title="2.启动本地服务"></a>2.启动本地服务</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo s</span><br></pre></td></tr></table></figure>
-
-<h5 id="3-写博客"><a href="#3-写博客" class="headerlink" title="3.写博客"></a>3.写博客</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo n&quot;文章内容&quot;</span><br></pre></td></tr></table></figure>
-
-<p>然后<code>hexo clean</code>，   <code>hexo -g</code>可重新生成</p>
-<h2 id="部署到github"><a href="#部署到github" class="headerlink" title="部署到github"></a>部署到github</h2><h5 id="1-在github上创建一个仓库，用户名为github的用户名"><a href="#1-在github上创建一个仓库，用户名为github的用户名" class="headerlink" title="1.在github上创建一个仓库，用户名为github的用户名"></a>1.在github上创建一个仓库，用户名为github的用户名</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">用户名.github.io</span><br></pre></td></tr></table></figure>
-
-<h5 id="2安装组件"><a href="#2安装组件" class="headerlink" title="2安装组件"></a>2安装组件</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cnpm install &#96;--&#96;save hexo-deployer-git</span><br></pre></td></tr></table></figure>
-
-<h5 id="3-修改根目录下-config-yml文件，修改deploy中的配置"><a href="#3-修改根目录下-config-yml文件，修改deploy中的配置" class="headerlink" title="3.修改根目录下_config.yml文件，修改deploy中的配置"></a>3.修改根目录下_config.yml文件，修改deploy中的配置</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  type: ‘git’</span><br><span class="line">  repo: https:&#x2F;&#x2F;github.com&#x2F;用户名&#x2F;用户名.github.io.git</span><br><span class="line">  branch: master</span><br></pre></td></tr></table></figure>
-
-<h5 id="4-部署"><a href="#4-部署" class="headerlink" title="4.部署"></a>4.部署</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo d</span><br></pre></td></tr></table></figure>
-
-<h2 id="修改主题"><a href="#修改主题" class="headerlink" title="修改主题"></a>修改主题</h2><h5 id="1-登录hexo官网，选择自己喜欢的主题，然后在themes目录中进行克隆"><a href="#1-登录hexo官网，选择自己喜欢的主题，然后在themes目录中进行克隆" class="headerlink" title="1.登录hexo官网，选择自己喜欢的主题，然后在themes目录中进行克隆"></a>1.登录hexo官网，选择自己喜欢的主题，然后在themes目录中进行克隆</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone --depth&#x3D;1 https:&#x2F;&#x2F;github.com&#x2F;JoeyBling&#x2F;hexo-theme-yilia-plus.git .&#x2F;yilia-plus</span><br></pre></td></tr></table></figure>
-
-<h5 id="2-配置"><a href="#2-配置" class="headerlink" title="2.配置"></a>2.配置</h5><p>修改hexo根目录下的 <code>_config.yml</code> ， <code>theme: yilia-plus</code></p>
-<p>再在<code>_config.yml</code>进行个人配置，然后重新部署即可</p>
-
+    
+    <a class="article-more-a" href="/2020/01/30/%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%90%AD%E5%BB%BAhexo%E5%8D%9A%E5%AE%A2/#more">more >></a>
+    
     
 
     
